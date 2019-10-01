@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    HTML
+{% endblock %}
+
+{% block main %}
+
+    <h5>Balance Summary</h5>
+    <table id="bal" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>Cash Balance</th>
+                <th>Stock Value</th>
+                <th>Total Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><em> {{ cash_bal }} </em></td>
+                <td><em> {{ stock_val }} </em></td>
+                <td><em> {{ total_bal }} </em></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h5>Stock Table</h5>
+    <table class="table table-striped table-dark">
+        <thead>
+            <tr>
+                <th>Company Name</th>
+                <th>Symbol</th>
+                <th>Current price of stock</th>
+                <th>Quantity Owned</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(l) %}
+                {% if stocks[i]["quantity"] > 0 %}
+                    <tr>
+                        <td> {{ stocks[i]["name"] }} </td>
+                        <td> {{ stocks[i]["sym"] }} </td>
+                        <td> {{ stocks[i]["price"] }} </td>
+                        <td> {{ stocks[i]["quantity"] }} </td>
+                        <td> {{ stocks[i]["val"] }} </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}

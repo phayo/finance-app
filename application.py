@@ -75,6 +75,57 @@ def index():
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
+def buy():
+    """Buy shares of stock"""
+    if request.method == "POST":
+
+        if not request.form.get("shares") or not request.form.get("symbol"):
+            return apology("Fill all de fields nah!S", 403)
+        else:
+            shares = request.form.get("shares")
+            symbol = request.form.get("symbol")
+
+            try:
+                shares = int(shares)
+            except ValueError:
+                return apology("Put a valid share joor", 400)
+
+            # validate shares more that 1
+            if shares < 1:
+                return apology("You neva put quantity of stock", 400)
+            result = lookup(symbol)
+            if result == None:
+                return apology("The Symbol you select no valid o!", 400)
+            else:
+                userid = session.get("user_id")
+                price = des(result["price"])
+                amt = price * shares
+                user = db.execute("SELECT cash FROM users WHERE id = :id", id=userid)
+                bal = des(user[0]['cash'])
+                if bal < amt:
+                    return apology("You do not have enough balance to buy this stock", 400)
+                nbal = des(bal - amt)
+                # update transaction
+                db.execute("INSERT INTO transactions (user, type, symbol, quant, prev, new, price) VALUES (:userid, :type, :sym, :shares, :bal, :nbal, :price)", userid=userid,
+                           type="BUY", sym=symbol, shares=shares, bal=bal, nbal=nbal, price=price)
+
+                # update cash bal
+                db.execute("UPDATE users SET cash = :nbal WHERE id = :userid", nbal=nbal, userid=userid)
+
+                # record stock
+                stock = db.execute("SELECT quantity FROM stock WHERE userid = :id AND sym = :sym", id=userid, sym=symbol)
+
+                if stock == []:
+                    db.execute("INSERT INTO stock (userid, sym, quantity) VALUES (:userid, :sym, :quant)",
+                               userid=userid, sym=symbol, quant=shares)
+                else:
+                    nstock = int(stock[0]["quantity"]) + shares
+                    print(nstock)
+                    db.execute("UPDATE stock SET quantity = :nstock WHERE userid = :id AND sym = :sym",
+                               nstock=nstock, id=userid, sym=symbol)
+                return redirect("/")
+    else:
+        return render_template("buy.html")
 
 
 @app.route("/check", methods=["GET"])
@@ -86,8 +137,6 @@ def index():
 
 @app.route("/register", methods=["GET", "POST"])
 
-
-@app.route("/login", methods=["GET", "POST"])
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -124,8 +173,6 @@ def login():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
-
-
 
 
 @app.route("/quote", methods=["GET", "POST"])

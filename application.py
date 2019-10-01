@@ -40,6 +40,9 @@ db = SQL("sqlite:///finance.db")
 if not os.environ.get("API_KEY"):
     raise RuntimeError("API_KEY not set")
 
+def des(num):
+    return int(num * 100) / 100
+
 
 @app.route("/")
 @login_required

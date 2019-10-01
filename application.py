@@ -136,6 +136,20 @@ def buy():
 
 @app.route("/history")
 @login_required
+def history():
+    """Show history of transactions"""
+    userid = session.get("user_id")
+    history = db.execute("SELECT * FROM transactions WHERE user = :userid", userid=userid)
+    if (len(history) == 0):
+        return render_template("empty.html", message="No history to display")
+    cash_bal = db.execute("SELECT cash FROM users WHERE id = :id", id=userid)
+
+    # format USD values to money
+    for i in range(len(history)):
+        history[i]['prev'] = usd(history[i]['prev'])
+        history[i]['new'] = usd(history[i]['new'])
+
+    return render_template("history.html", history=history, l=len(history), cash_bal=usd(cash_bal[0]['cash']))
 
 
 @app.route("/register", methods=["GET", "POST"])

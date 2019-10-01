@@ -229,6 +229,8 @@ def quote():
 # redirect if user attempts to call quoted with query
 @app.route("/quoted", methods=["GET"])
 @login_required
+def quoted():
+    return redirect("/quote")
 
 
 @app.route("/sell", methods=["GET", "POST"])

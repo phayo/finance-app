@@ -235,6 +235,53 @@ def quoted():
 
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
+def sell():
+    """Sell shares of stock"""
+
+    userid = session.get("user_id")
+    options = db.execute("SELECT * FROM stock WHERE userid = :userid", userid=userid)
+    l = len(options)
+    if request.method == "POST":
+        # check all input are valid
+        if not request.form.get("symbol") or not request.form.get("shares"):
+            return apology("check all input field naa!", 400)
+
+        sym = request.form.get("symbol")
+        quant = int(request.form.get("shares"))
+        syms = [options[i]['sym'] for i in range(l)]
+        if not sym in syms:
+            return apology("You wan sell stock wey you no get?!", 400)
+
+        s = [options[i] for i in range(l) if options[i]['sym'] == sym]
+
+        if quant > s[0]["quantity"]:
+            return apology("You no get the quantity you wan sell, reduce hand", 400)
+
+        q = s[0]['quantity'] - quant
+
+        # get actual price
+        res = lookup(sym)
+        price = des(res['price'])
+        pz = des(quant * price)
+
+        cash = db.execute("SELECT cash FROM users WHERE id = :userid", userid=userid)
+
+        amt = des(cash[0]['cash'] + pz)
+
+        # update cash
+        db.execute("UPDATE users SET cash = :amt WHERE id = :userid", amt=amt, userid=userid)
+
+        # update new quantity
+        db.execute("UPDATE stock SET quantity = :q WHERE userid = :userid AND sym = :sym", q=q, userid=userid, sym=sym)
+
+        # update transaction
+        db.execute("INSERT INTO transactions (user, type, symbol, quant, prev, new, price) VALUES (:userid, :type, :sym, :shares, :bal, :nbal, :price)", userid=userid,
+                   type="SELL", sym=sym, shares=quant, bal=des(cash[0]['cash']), nbal=amt, price=price)
+        return redirect("/")
+    else:
+        if l == 0:
+            return render_template("empty.html", message="No stocks to sell")
+        return render_template("sell.html", options=options, l=l)
 
 
 def errorhandler(e):

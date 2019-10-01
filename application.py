@@ -43,6 +43,34 @@ if not os.environ.get("API_KEY"):
 
 @app.route("/")
 @login_required
+def index():
+    """Show portfolio of stocks"""
+    userid = session.get("user_id")
+    stocks = db.execute("SELECT * FROM stock WHERE userid = :userid", userid=userid)
+    stock_val = 0
+
+    # Show default id user does nt have any stocks
+    if len(stocks) == 0:
+        return render_template("empty.html", message="No information to display")
+    print(len(stocks))
+    for i in range(len(stocks)):
+
+        sym = stocks[i]['sym']
+        up = lookup(sym)
+        val = up['price'] * stocks[i]['quantity']
+        stocks[i].update({'name': up['name']})
+        stocks[i].update({'val': usd(val)})
+        stocks[i].update({'price': usd(up['price'])})
+        stock_val += val
+
+    cb = db.execute("SELECT * FROM users WHERE id = :userid", userid=userid)
+
+    total_bal = usd(cb[0]['cash'] + stock_val)
+    stock_val = usd(stock_val)
+    cash_bal = usd(cb[0]['cash'])
+    l = len(stocks)
+
+    return render_template("index.html", stocks=stocks, stock_val=stock_val, cash_bal=cash_bal, total_bal=total_bal, l=l)
 
 
 @app.route("/buy", methods=["GET", "POST"])

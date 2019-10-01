@@ -225,7 +225,6 @@ def quote():
         return render_template("quote.html")
 
 
-
 # redirect if user attempts to call quoted with query
 @app.route("/quoted", methods=["GET"])
 @login_required

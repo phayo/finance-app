@@ -1,3 +1,8 @@
+body {
+    background: url("https://www.kiplinger.com/slideshow/investing/T052-S002-best-stocks-funds-and-investment-advice/images/intro.jpg")
+}
+
+
 nav .navbar-brand
 {
     /* size for brand */
@@ -47,6 +52,8 @@ main
 
     /* center contents */
     text-align: center;
+
+    background-color: #567cada4;
 }
 
 main img

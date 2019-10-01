@@ -209,6 +209,20 @@ def login():
 
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
+def quote():
+    """Get stock quote."""
+    if request.method == "POST":
+        if not request.form.get("symbol"):
+            return apology("You neva put symbol o", 400)
+        symbol = request.form.get("symbol")
+        result = lookup(symbol)
+        if result == None:
+            return apology("The Symbol ypu select no valid o!", 400)
+        else:
+            result["price"] = usd(des(result["price"]))
+            return render_template("quoted.html", result=result)
+    else:
+        return render_template("quote.html")
 
 
 

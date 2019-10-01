@@ -139,6 +139,35 @@ def buy():
 
 
 @app.route("/register", methods=["GET", "POST"])
+def register():
+    """ Register a new user or return register page"""
+
+    # forget any user id
+    session.clear()
+
+    # return register page if method is get
+    if request.method == "POST":
+        # check whether user filled out all inputs
+        if not request.form.get("username") or not request.form.get("password") or not request.form.get("confirmation"):
+            return apology("you must fill out all fields", 400)
+        # check if passwords are the same
+        elif not request.form.get("password") == request.form.get("confirmation"):
+            return apology("Password Mismatch", 400)
+        else:
+            row = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+            if len(row) >= 1:
+                return apology("Person don take this username", 400)
+            hash = generate_password_hash(request.form.get("password"))
+            userid = db.execute("INSERT INTO users (username, hash) VALUES (:username, :hash)",
+                                username=request.form.get("username").strip(), hash=hash)
+
+            # set new user id in session
+            session["user_id"] = userid
+
+            # Redirect user to home page
+            return redirect("/")
+    else:
+        return render_template("register.html")
 
 
 @app.route("/login", methods=["GET", "POST"])

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Stock quote
+{% endblock %}
+
+{% block main %}
+    <table class="table table-dark">
+        <thead>
+            <tr>
+                <th>Company Name</th>
+                <th>Current price of stock</th>
+                <th>Symbol</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> {{ result["name"] }} </td>
+                <td> {{ result["price"] }} </td>
+                <td> {{ result["symbol"] }} </td>
+            </tr>
+        </tbody>
+
+    </table>
+{% endblock %}

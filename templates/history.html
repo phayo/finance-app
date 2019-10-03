@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+
+    <h5 class="gold">Cash Balance</h5>
+    <table id="bal" class="table text-white">
+        <thead class="thead-dark">
+            <tr>
+                <th>Cash Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><em> {{ cash_bal }} </em></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h5 class="gold">Stock History Table</h5>
+    <table class="table table-striped text-white">
+        <thead class="thead-dark">
+            <tr>
+                <th>Symbol</th>
+                <th>Transaction Type</th>
+                <th>*Price</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+                <th>Start Bal.</th>
+                <th>End Bal.</th>
+                <th>Date</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in range(l) %}
+                <tr>
+                    <td> {{ history[i]["symbol"] }} </td>
+                    <td> {{ history[i]["type"] }} </td>
+                    <td> {{ history[i]["price"] }} </td>
+                    <td> {{ history[i]["quant"] }} </td>
+                    <td> {{ history[i]["price"] }} </td>
+                    <td> {{ history[i]["prev"] }} </td>
+                    <td> {{ history[i]["new"] }} </td>
+                    <td> {{ history[i]["date"] }} </td>
+                    <td> {{ history[i]["time"] }} </td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Join Us
+{% endblock %}
+
+{% block main %}
+    <form action="/register" name="register" method="post">
+        <div class="form-group mb-0">
+            <input autocomplete="off" autofocus class="form-control" id="userreg" name="username" placeholder="Username" type="text">
+        </div>
+        <small class="small text-danger">Username already exists</small>
+        <div class="form-group mt-2">
+            <input class="form-control" name="password" placeholder="Password" type="password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="confirmation" placeholder="Retype Password" type="password">
+        </div>
+        <button class="btn btn-primary" id="reg" type="submit">Register</button>
+    </form>
+
+    <script>
+        $(document).ready(function(e){
+            $(".small").hide();
+             $('form[name=register]').submit(function(e){
+                 alert("check");
+                 $.ajax({
+                    url: '/check',
+                    data: {
+                        "username": $("#userreg").val()
+                    },
+                    method: "GET",
+                    success: function(response){
+                        if (!response)
+                        {
+                            $(".small").show();
+                            e.preventDefault();
+                        }
+                    }
+                });
+             })
+        });
+    </script>
+
+
+{% endblock %}
